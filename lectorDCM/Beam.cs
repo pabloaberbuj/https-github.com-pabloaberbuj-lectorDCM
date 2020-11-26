@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Dicom;
 
 namespace lectorDCM
 {
@@ -24,6 +25,17 @@ namespace lectorDCM
         public double TableTopLateralSetupDisplacement { get; set; }
         public double BeamDose { get; set; }
         public double BeamMeterset { get; set; }
+
+        public void Extraer(DicomDataset beamDcm, DicomDataset referenceBeamDcm) //incompleto
+        {
+            BeamNumber = beamDcm.GetSingleValue<int>(DicomTag.BeamNumber);
+            BeamName = beamDcm.GetSingleValue<string>(DicomTag.BeamName);
+            NumberOfWedges = beamDcm.GetSingleValue<int>(DicomTag.NumberOfWedges);
+            //PatientPosition = beamDcm.GetSingleValue<string>(DicomTag.PatientPosition);
+            BeamDose = referenceBeamDcm.GetSingleValue<double>(DicomTag.BeamDose);
+            BeamMeterset = referenceBeamDcm.GetSingleValue<double>(DicomTag.BeamMeterset);
+        }
+
     }
 
     public enum BeamType
