@@ -21,23 +21,31 @@ namespace lectorDCM
         public List<Beam> Beams { get; set; }
         public ToleranceTable ToleranceTable { get; set; }
         public ApprovalStatus ApprovalStatus { get; set; }
-        public DateTime ReviewDate { get; set; }
-        public DateTime ReviewTime { get; set; }
-        public string ReviewerName { get; set; }
+        public DateTime ReviewDate { get; set; } //No lo volví a encotnrar, no sé si sirve
+        public DateTime ReviewTime { get; set; } //No lo volví a encotnrar, no sé si sirve
+        public string ReviewerName { get; set; } //No lo volví a encotnrar, no sé si sirve
 
-        public void Extraer(string archivo)
+        public Plan(string archivo, List<Paciente> pacientes)
         {
             var dcm = DicomFile.Open(archivo);
             Paciente = new Paciente(dcm);
+            Paciente.asignarPaciente(pacientes, this);
             Paciente.Planes.Add(this);
-            StudyDescription = dcm.Dataset.GetSingleValue<string>(DicomTag.StudyDescription);
-            //OperatorName = dcm.Dataset.TryGetValue<string>(DicomTag.OperatorsName);
-            PlanLabel = dcm.Dataset.GetSingleValue<string>(DicomTag.RTPlanLabel);
-            PlanDate = dcm.Dataset.GetSingleValue<DateTime>(DicomTag.RTPlanDate);
-            PlanTime = dcm.Dataset.GetSingleValue<DateTime>(DicomTag.RTPlanTime);
             SOPClassUID = ObtenerSOPClassUID(dcm);
             SOPInstanceUID = dcm.Dataset.GetSingleValue<string>(DicomTag.SOPInstanceUID);
             Modality = (Modality)Enum.Parse(typeof(Modality), dcm.Dataset.GetSingleValue<string>(DicomTag.Modality));
+            StudyDescription = dcm.Dataset.GetSingleValue<string>(DicomTag.StudyDescription);
+            string auxOperatorName = "";
+            if (dcm.Dataset.TryGetValue<string>(DicomTag.OperatorsName, 0, out auxOperatorName))
+            {
+                OperatorName = auxOperatorName;
+            }
+            PlanLabel = dcm.Dataset.GetSingleValue<string>(DicomTag.RTPlanLabel);
+            PlanDate = dcm.Dataset.GetSingleValue<DateTime>(DicomTag.RTPlanDate);
+            PlanTime = dcm.Dataset.GetSingleValue<DateTime>(DicomTag.RTPlanTime);
+            
+            
+            
             var DoseReferenceSequence = dcm.Dataset.GetSequence(DicomTag.DoseReferenceSequence);
             var FractionGroupSequence = dcm.Dataset.GetSequence(DicomTag.FractionGroupSequence);
             var ReferencedBeamSequence = FractionGroupSequence.Items[0].GetSequence(DicomTag.ReferencedBeamSequence);
@@ -56,10 +64,12 @@ namespace lectorDCM
                         break;
                     }
                 }
-                Beam campo = new Beam();
-                campo.Extraer(beamDcm,referencedBeam);
-                Beams.Add(campo);
+                Beam beam = new Beam(beamDcm, referencedBeam);
+                Beams.Add(beam);
+                beam.Plan = this;
+                beam.Paciente = this.Paciente;
             }
+            ToleranceTable = new ToleranceTable(dcm);
             ApprovalStatus = (ApprovalStatus)Enum.Parse(typeof(ApprovalStatus), dcm.Dataset.GetSingleValue<string>(DicomTag.ApprovalStatus),true);
         }
 

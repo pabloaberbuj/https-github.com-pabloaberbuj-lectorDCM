@@ -21,5 +21,10 @@ namespace lectorDCM
         public DateTime TreatmentTime { get; set; }
         public SOPClassUID ReferencedRTPlanSOPClassUID { get; set; }
         public string ReferencedRTPlanSOPInstanceUID { get; set; }
+
+        public BeamRecord():base(null,null)
+        {
+
+        }
     }
 }

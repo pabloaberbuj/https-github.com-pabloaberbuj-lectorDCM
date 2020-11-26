@@ -13,15 +13,16 @@ namespace lectorDCM
             Console.WriteLine("Hello World!");
             Stopwatch sw = new Stopwatch();
             sw.Start();
+            List<Paciente> pacientes = new List<Paciente>();
             List<Plan> planes = new List<Plan>();
-            var archivos = Directory.GetFiles(@"C:\Users\Casa\Documents\Pablo Trabajo\nueva carpeta", "*.dcm", SearchOption.AllDirectories);
+            var archivos = Directory.GetFiles(@"D:\Cosas pasar\Pablo Trabajo\nueva carpeta", "*.dcm", SearchOption.AllDirectories);
             
             foreach (string archivo in archivos)
             {
                 if (Plan.ObtenerSOPClassUID(DicomFile.Open(archivo))==SOPClassUID.RTPlanStorage)
                 {
-                    Plan plan = new Plan();
-                    plan.Extraer(archivo);
+                    Plan plan = new Plan(archivo, pacientes);
+                    //pacientes.Add(plan.Paciente);
                     planes.Add(plan);
                     Console.WriteLine("Se ha agregado 1 plan: " + plan.PlanLabel + " del paciente: " + plan.Paciente.Nombre);
                 }

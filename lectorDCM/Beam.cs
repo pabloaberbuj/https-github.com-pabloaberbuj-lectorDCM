@@ -26,7 +26,7 @@ namespace lectorDCM
         public double BeamDose { get; set; }
         public double BeamMeterset { get; set; }
 
-        public void Extraer(DicomDataset beamDcm, DicomDataset referenceBeamDcm) //incompleto
+        public Beam(DicomDataset beamDcm, DicomDataset referenceBeamDcm) //incompleto
         {
             BeamNumber = beamDcm.GetSingleValue<int>(DicomTag.BeamNumber);
             BeamName = beamDcm.GetSingleValue<string>(DicomTag.BeamName);

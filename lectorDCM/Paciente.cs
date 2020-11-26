@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Text;
@@ -17,6 +18,24 @@ namespace lectorDCM
             Nombre = dcm.Dataset.GetSingleValue<string>(DicomTag.PatientName);
             ID = dcm.Dataset.GetSingleValue<string>(DicomTag.PatientID);
             Planes = new List<Plan>();
+        }
+
+        public void asignarPaciente(List<Paciente> pacientes, Plan plan)
+        {
+            if (pacientes.Count>0 && pacientes.Any(p=>p.Nombre==Nombre && p.ID == ID))
+            {
+                pacientes.Where(p => p.Nombre == Nombre && p.ID == ID).First().Planes.Add(plan);
+            }
+            else
+            {
+                Planes.Add(plan);
+                pacientes.Add(this);
+            }
+        }
+
+        public override string ToString()
+        {
+            return ID + "-" + Nombre;
         }
     }
 }
